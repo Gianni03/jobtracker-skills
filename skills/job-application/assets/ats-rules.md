@@ -1,30 +1,34 @@
-# ATS Symbol Exclusion Rules
+# ATS-Safe Text Rules
 
-In text content, the CV must NEVER contain these symbols: `#`, `-`, `/`, `*`. The only accepted separator is `|`.
+These rules are a precaution, not a hard requirement of every ATS. Modern parsers handle standard bullets, hyphens, and most punctuation. The goal is clean text and predictable parsing across old and new systems.
 
-**Allowed with numbers**: `%` and `+` are no longer forbidden when they accompany numbers — use "5+ years", "30%", "100+", "90%". Recruiters scan resumes in 6-10 seconds and numerals with symbols stand out visually. Do NOT spell out quantities or percentages ("5 plus years" and "30 percent" are wrong — write "5+ years" and "30%").
+## Keep
 
-## Replacement Table
+- `|` as the section separator.
+- Numerals with symbols: "5+ years", "30%", "100+", "90%". Do NOT spell out quantities ("5 plus years", "30 percent").
+- Standard bullet characters. `make_docx.py` renders `- ` lines as bullets by default; pass `--plain` for plain indented paragraphs.
+- Hyphens in compound words and dates: "end-to-end", "cross-functional", "August 2025 - Present". "August 2025 to Present" is also fine and reads cleanly.
+- Exact technology names that contain symbols: `C#`, `C++`, `.NET`, `F#`. Do NOT rewrite them; ATS keyword matching looks for the exact term.
 
-| Forbidden | Replacement | Example |
-|---|---|---|
-| `-` in compound words | space | "end-to-end" -> "end to end", "cross-functional" -> "cross functional" |
-| `-` in date ranges | full month names, space separator, NO dash | "Aug 2025 - Present" -> "August 2025 Present" |
-| `/` in text | space or "and" | "UI/UX" -> "UI UX", "HTML/CSS" -> "HTML and CSS" |
-| `#` in text | remove or rephrase | `#` breaks legacy and small ATS parsers |
-| `*` in text | remove or rephrase | `*` breaks legacy and small ATS parsers |
-| Bullet characters | none (plain paragraphs) | Achievement lines are plain indented text, no bullet symbol in docx/pdf output |
+## Avoid or replace
 
-## Markdown Source vs Output
+| Symbol | Why | Replacement | Example |
+|---|---|---|---|
+| `#` in prose | Can confuse legacy parsers and markdown-aware tools | Remove or rephrase | "issue #123" -> "issue 123" |
+| `*` | Can be read as a wildcard or markup | Remove or rephrase | "5* rating" -> "5 star rating" |
+| `/` in prose | Can merge words in some parsers | Space or "and" | "UI/UX" -> "UI UX", "HTML/CSS" -> "HTML and CSS" |
+| Decorative symbols | Noise in the text layer | Remove | Emoji, arrows, box-drawing characters |
 
-The markdown structural markers (`#`, `##`, `###`, `-`) are fine in the `.md` source file. The `make_docx.py` converter strips them. The ATS rules apply to the TEXT CONTENT and the docx/pdf OUTPUT only.
+## Markdown source vs output
+
+The markdown structural markers (`#`, `##`, `###`, `-`) are fine in the `.md` source. The `make_docx.py` converter turns them into formatting. These rules apply to the TEXT CONTENT and the docx/pdf output only.
 
 ## Verification
 
-After generating the PDF, verify no forbidden symbols leaked (note: `%` and `+` are allowed, so they are NOT in the regex):
+After generating the PDF, check for the symbols that still matter. `%`, `+`, `-`, and `/` inside URLs are allowed, so they are not in the regex. Technology names like `C#` and `F#` are also allowed.
 
 ```bash
-pdftotext "<output.pdf>" - | grep -nE '[-#*/]'
+pdftotext "<output.pdf>" - | grep -nE '(^|[^A-Za-z])[#*]'
 ```
 
-Empty output means clean.
+Review manually if the output contains `/` outside URLs. Empty output means clean.

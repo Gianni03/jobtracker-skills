@@ -2,13 +2,13 @@
 """Convert a markdown resume to .docx using python-docx.
 
 Usage:
-    python3 make_docx.py <input.md> <output.docx>
+    python3 make_docx.py <input.md> <output.docx> [--plain]
 
 Handles:
   - # H1  -> centered name (16pt bold)
   - ## H2 -> section header (11pt bold, uppercase)
   - ### H3 -> role/title line (10pt bold)
-  - - bullet -> List Bullet style
+  - - bullet -> List Bullet style (default) or plain indented paragraph (--plain)
   - **bold** inline formatting
   - [text](url) -> clickable hyperlinks (blue, underlined)
   - --- horizontal rule
@@ -83,7 +83,7 @@ def add_inline(paragraph, text: str) -> None:
             run = paragraph.add_run(part)
 
 
-def md_to_docx(md_path: str, docx_path: str) -> None:
+def md_to_docx(md_path: str, docx_path: str, plain: bool = False) -> None:
     lines = Path(md_path).read_text(encoding="utf-8").split("\n")
     doc = Document()
 
@@ -157,12 +157,16 @@ def md_to_docx(md_path: str, docx_path: str) -> None:
             run = p.add_run("_" * 90)
             run.font.size = Pt(5)
 
-        # Bullet point -> plain paragraph (ATS-friendly, no bullet character)
+        # Bullet point -> List Bullet (default) or plain indented paragraph (--plain)
         elif line.lstrip().startswith("- "):
             text = line.lstrip()[2:].strip()
-            p = doc.add_paragraph()
-            p.paragraph_format.space_after = Pt(0)
-            p.paragraph_format.left_indent = Inches(0.15)
+            if plain:
+                p = doc.add_paragraph()
+                p.paragraph_format.space_after = Pt(0)
+                p.paragraph_format.left_indent = Inches(0.15)
+            else:
+                p = doc.add_paragraph(style="List Bullet")
+                p.paragraph_format.space_after = Pt(0)
             add_inline(p, text)
 
         # Empty line - just spacing
@@ -182,7 +186,9 @@ def md_to_docx(md_path: str, docx_path: str) -> None:
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print(f"Usage: {sys.argv[0]} <input.md> <output.docx>", file=sys.stderr)
+    args = [arg for arg in sys.argv[1:] if arg != "--plain"]
+    plain = "--plain" in sys.argv[1:]
+    if len(args) != 2:
+        print(f"Usage: {sys.argv[0]} <input.md> <output.docx> [--plain]", file=sys.stderr)
         sys.exit(1)
-    md_to_docx(sys.argv[1], sys.argv[2])
+    md_to_docx(args[0], args[1], plain=plain)

@@ -4,7 +4,7 @@ description: "Trigger: cover letter, cold outreach, adapt resume, adaptar cv, co
 license: Apache-2.0
 metadata:
   author: "giannipasquinelli"
-  version: "2.0"
+  version: "2.1"
 ---
 
 ## Activation Contract
@@ -22,13 +22,13 @@ If `assets/profile.md` does not exist, run the Setup flow first (see `assets/set
 - **File naming**: adapted CVs as `<firstname>_<lastname>_<position>_<company>.{md,docx,pdf}`. All other modes in a single file `<firstname>_<lastname>_application_<company>.md` with each mode as a section.
 - **Reverse chronological order**: work experience roles MUST be most-recent-first. Never reorder roles by JD relevance. Only reorder bullets within each role.
 - **Clickable links**: contact line MUST use markdown links `[text](url)` for email, portfolio, LinkedIn, GitHub. Projects link to their URLs. `make_docx.py` converts these to clickable hyperlinks.
-- **ATS symbol exclusion**: in text content, the CV must NEVER contain `#`, `-`, `/`, `*`. Only `|` as separator. `%` and `+` ARE allowed with numbers (e.g., "5+ years", "30%"). See `assets/ats-rules.md` for the full rules.
+- **ATS-safe text**: keep `|` as the separator and numerals with symbols ("5+ years", "30%"). Avoid `#` and `*` in prose, but keep exact technology names like `C#`, `C++`, and `.NET`. Write `UI/UX` as `UI UX` and `HTML/CSS` as `HTML and CSS`. Hyphens are allowed in compound words and dates; prefer "August 2025 to Present" for date ranges. Standard bullets are allowed: `make_docx.py` renders `- ` lines as bullets by default. See `assets/ats-rules.md`.
 - **Number formatting**: use numerals with symbols, never spell out quantities or percentages. Write "5+ years", "30%", "100+", "90%". Do NOT write "5 plus years" or "30 percent". Numerals with symbols stand out visually during the 6-10 second recruiter scan.
-- **Page length**: 1-2 pages allowed. If content exceeds 1 page, break by complete section — never let a single line or bullet spill onto the next page. Maintain visual balance between pages. A well-structured 2-page resume performs as well or better than a cramped 1-page one.
+- **Page length**: default to 1 page. Use 2 pages only when the candidate has 5+ years of relevant experience and page 2 is at least about 40% full. Break by complete section. Never let a single line or bullet spill onto the next page. A balanced 2-page resume is acceptable; a sparse or cramped one is not.
 - **Proficiency levels**: only "Working proficiency" skills go in CV Skills section. "Learning/In Progress" skills NEVER appear there. When in doubt, omit.
 - **No fabrication**: if the JD asks for a skill the user does not have, do not add it. Emphasize adjacent transferable skills.
 - **Personalization is mandatory**: every artifact references specifics from the JD, company, and user's achievements. No cliches ("passionate", "team player", "apasionado").
-- **No JD parroting**: never copy phrases from the JD into the CV. Use the user's own language to describe their experience. Keywords (technology names) belong in the Skills section. Sentences should sound like the person, not the job description.
+- **No JD parroting**: never copy phrases from the JD into the CV. Use the user's own language to describe their experience. Keywords (technology names) belong in the Skills section. Sentences should sound like the person, not the job description. Exception: mirror the job title in the headline and role line, because ATS and recruiters match titles.
 - **Anti-AI voice**: no em dashes. No long sentences chained with commas or semicolons. Short sentences. Direct. Natural rhythm. If a sentence has more than 2 commas, split it.
 - **Company research**: use `webfetch` on the company's About/Careers page when available. If webfetch fails, work from JD and flag the gap.
 - **Load the playbook** for the requested mode from `assets/playbooks.md` before generating.
@@ -55,7 +55,7 @@ If `assets/profile.md` does not exist, run the Setup flow first (see `assets/set
 5. If company-research, why-company, or cover-letter: optionally `webfetch` the company About/Careers page.
 6. Read the playbook section from `assets/playbooks.md`.
 7. Generate the artifact following the playbook rules.
-8. For adapt-resume: write `.md`, convert to `.docx` with `python3 assets/make_docx.py <input.md> <output.docx>`, convert to `.pdf` with `libreoffice --headless --convert-to pdf`, verify pages (1-2 allowed) with `pdfinfo`.
+8. For adapt-resume: write `.md`, convert to `.docx` with `python3 assets/make_docx.py <input.md> <output.docx>` (add `--plain` for plain paragraphs), convert to `.pdf` with `libreoffice --headless --convert-to pdf`, verify pages (default 1, max 2) with `pdfinfo`.
 9. Present results inline. Report saved file path(s).
 
 ## Output Contract

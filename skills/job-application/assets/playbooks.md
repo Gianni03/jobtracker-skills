@@ -55,21 +55,16 @@ Produce a resume adapted to the JD's keywords and emphasis, WITHOUT fabricating 
 - **Keyword alignment**: extract the top 8-12 keywords/technologies from the JD. Ensure each one that appears in the profile (skills or experience) is prominently placed. Do NOT add keywords that aren't backed by real experience.
 - **Summary rewrite**: tailor the professional summary to the role. Lead with the most JD-relevant framing of the user's profile.
 - **Experience emphasis**: reorder bullet points within each role to put the most JD-relevant achievements first. Use the user's own language to describe their work. Do NOT parrot JD phrases. The goal is to make relevant experience VISIBLE, not to echo the JD's wording. Keywords belong in the Skills section and naturally in descriptions where truthful, but sentences should sound like the person describing their own work, not like they copied the JD.
-- **Anti-parrot rule**: never copy phrases from the JD into the CV. If the JD says "fault-tolerant financial systems", do not write "fault tolerant systems" in the summary. Instead, describe the same concept in the user's own words (e.g., "systems built to handle edge cases without breaking"). The only exception is the Skills section, where technology names (React, TypeScript, REST APIs) are listed as-is because those are factual keywords ATS scanners look for.
+- **Anti-parrot rule**: never copy phrases from the JD into the CV. If the JD says "fault-tolerant financial systems", do not write "fault tolerant systems" in the summary. Instead, describe the same concept in the user's own words (e.g., "systems built to handle edge cases without breaking"). Two exceptions: (1) the Skills section, where technology names (React, TypeScript, REST APIs) are listed as-is because those are factual keywords ATS scanners look for; (2) the job title in the headline and role line, because ATS and recruiters match titles.
 - **Reverse chronological order**: roles MUST be listed most-recent-first. The current role (Present) always goes first. Never reorder roles by JD relevance. Only reorder bullets within each role.
 - **Clickable links**: the contact line MUST use markdown links `[text](url)` for email, portfolio, LinkedIn, and GitHub. Projects (if included) must link to their URLs.
 - **Skills section**: reorder to match JD priority order. Add nothing that isn't in profile.md.
 - **No fabrication**: if the JD asks for a skill the user doesn't have, do not add it. Instead, emphasize adjacent transferable skills.
 - **Project inclusion threshold**: only include projects with a clear, specific connection to a JD requirement. If the connection is weak or generic ("it uses TypeScript"), omit the project. When in doubt, leave it out. A shorter, more relevant Projects section is better than a longer, padded one.
 - **Proficiency levels**: `assets/profile.md` classifies skills into three tiers: **Working proficiency** (list in CV Skills section), **Familiar/project-level** (mention only in project context), and **Learning/In Progress** (DO NOT list in CV Skills). Never inflate the CV. When in doubt, omit.
-- **Length**: 1-2 pages allowed. If content exceeds 1 page, break by complete section — never let a single line or bullet spill onto the next page. Maintain visual balance between pages. A well-structured 2-page resume performs as well or better than a cramped 1-page one.
+- **Length**: default to 1 page. Use 2 pages only when the candidate has 5+ years of relevant experience and page 2 is at least about 40% full. Break by complete section. Never let a single line or bullet spill onto the next page. A balanced 2-page resume is acceptable; a sparse or cramped one is not.
 - **Number formatting**: use numerals with symbols, never spell out quantities or percentages. Write "5+ years", "30%", "100+", "90%", "4 seconds", "20%". Do NOT write "5 plus years", "30 percent", or "more than 100".
-- **ATS symbol exclusion (MANDATORY)**: in text content, the CV must NEVER contain `#`, `-`, `/`, `*`. The only accepted separator is `|`. See `assets/ats-rules.md` for the full rules. Key replacements:
-  - `%` and `+` ARE ALLOWED with numbers: "5+ years", "30%", "100+", "90%"
-  - "end-to-end" -> "end to end"
-  - "UI/UX" -> "UI UX"
-  - "Aug 2025 - Present" -> "August 2025 Present" (full month names, space separator, NO dash)
-  - Achievement lines: plain text, NO bullet characters in output
+- **ATS-safe text**: keep `|` as the separator and numerals with symbols ("5+ years", "30%", "100+", "90%"). Avoid `#` and `*` in prose, but keep exact technology names like `C#`, `C++`, and `.NET`. Write `UI/UX` as `UI UX` and `HTML/CSS` as `HTML and CSS`. Hyphens are allowed in compound words and dates; prefer "August 2025 to Present" for date ranges. Bullet characters are allowed; `make_docx.py` renders `- ` lines as bullets by default. See `assets/ats-rules.md`.
 
 ## File generation
 1. Write the adapted resume as markdown (with `[text](url)` links) to:
@@ -78,26 +73,26 @@ Produce a resume adapted to the JD's keywords and emphasis, WITHOUT fabricating 
    `python3 assets/make_docx.py "<input.md>" "<output.docx>"`
 3. Convert to PDF (preserves hyperlinks):
    `libreoffice --headless --convert-to pdf "<output.docx>" --outdir output/`
-4. Verify pages (1-2 allowed): `pdfinfo "<output.pdf>" | grep Pages`
+4. Verify pages (default 1, max 2): `pdfinfo "<output.pdf>" | grep Pages`
 5. Report all three file paths (.md, .docx, .pdf).
 
 ## Markdown structure
 ```
 # <First Name> <Last Name>
-<title aligned to JD>
+<title matching the JD title>
 [email](mailto:email) | <location> | [Portfolio](<url>) | [LinkedIn](<url>) | [GitHub](<url>)
 
 ## PROFESSIONAL SUMMARY
-<adapted summary, no forbidden symbols>
+<adapted summary, ATS-safe text>
 
 ## WORK EXPERIENCE
-### <Most Recent Role (Present)> | <Company> | <Month Year Present>
-- <reordered bullets, plain text, no forbidden symbols>
-### <Previous Role> | <Company> | <Month Year Month Year>
+### <Most Recent Role (Present)> | <Company> | <Month Year to Present>
+- <reordered bullets, ATS-safe text>
+### <Previous Role> | <Company> | <Month Year to Month Year>
 - <reordered bullets>
 
 ## PROJECTS
-- [Project Name](<url>) | <description, no forbidden symbols>
+- [Project Name](<url>) | <description, ATS-safe text>
 
 ## TECHNICAL SKILLS
 <reordered, pipe separated>
@@ -109,7 +104,7 @@ Produce a resume adapted to the JD's keywords and emphasis, WITHOUT fabricating 
 <Institution> | <Degree> | <Year>
 ```
 
-Note: the `#`, `##`, `###`, and `-` are markdown structural markers for the converter only. They do NOT appear in the docx/pdf output. The ATS symbol rules apply to the TEXT CONTENT, not the markdown structure.
+Note: the `#`, `##`, `###`, and `-` are markdown structural markers for the converter only. They do NOT appear in the docx/pdf output. The ATS-safe text rules apply to the TEXT CONTENT, not the markdown structure.
 
 ## Quality check
 - [ ] Every keyword from the JD that exists in the profile appears in the adapted version.
@@ -119,11 +114,11 @@ Note: the `#`, `##`, `###`, and `-` are markdown structural markers for the conv
 - [ ] Bullets reordered by JD relevance within each role.
 - [ ] Contact line has clickable markdown links for email, portfolio, LinkedIn, GitHub.
 - [ ] Projects (if included) have clickable links.
-- [ ] No forbidden symbols in text content: no #, -, /, * in text. % and + ARE allowed with numbers (only | as separator).
+- [ ] ATS-safe text: no # or * in prose (technology names like C# are allowed); / replaced in prose; % and + allowed with numbers; | as separator.
 - [ ] Numerals with symbols used for quantities: "5+ years", "30%", not "5 plus years" or "30 percent".
-- [ ] Dates use full month names with space separator (August 2025 Present, not Aug 2025 - Present).
-- [ ] No bullet characters in docx/pdf output (plain text paragraphs).
-- [ ] 1-2 pages max. If 2 pages, break by complete section — no lone bullets or lines on page 2 (verify with pdfinfo).
+- [ ] Dates use full month names; date ranges use "to" or a hyphen (August 2025 to Present).
+- [ ] Bullets render correctly in docx/pdf (default) or plain paragraphs with --plain.
+- [ ] Default 1 page; 2 pages only if 5+ years and page 2 is at least ~40% full. Break by complete section; no lone bullets or lines on page 2.
 - [ ] .md, .docx, and .pdf all created in output/.
 
 ## Interactive Mode
@@ -149,7 +144,7 @@ When the user requests interactive mode ("interactive", "paso a paso", "revisar"
 ### After all sections are reviewed and approved:
 - Assemble the final CV markdown from the approved sections.
 - Convert to .docx and .pdf.
-- Verify pages (1-2 allowed) with pdfinfo.
+- Verify pages (default 1, max 2) with pdfinfo.
 - Report all file paths.
 
 ### Key rules:
